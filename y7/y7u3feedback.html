@@ -42,6 +42,31 @@ html,body{width:100%;margin:0;padding:0;background:#fff!important;color:#172b45;
 #feedback-stamp{display:flex!important;position:fixed;right:0;bottom:0;width:30mm;height:30mm;border:1px dashed #7d90a7;box-sizing:border-box;align-items:flex-start;justify-content:center;background:#fff!important;break-inside:avoid;z-index:10}
 #feedback-stamp span{font:7pt/1.2 system-ui,Arial,sans-serif;color:#536781;margin-top:2mm;text-align:center}
 }
+
+/* Readable quiz feedback in the one-page A4 print layout. */
+@media print{
+ html,body{font-size:9.3pt!important;line-height:1.22!important}
+ .hero .brand{font-size:8.3pt}
+ .hero h1{font-size:17.5pt}
+ .panel h2{font-size:12.2pt}
+ .feedback h3{font-size:10.3pt}
+ .feedback{padding:6px 7px}
+ .feedback li{margin:1px 0}
+ .task{padding:5px 8px;margin:0}
+ .task h3{font-size:10pt}
+ .task p{margin:1px 0 3px}
+ #tasks{gap:4px}
+ .printed-answer{font-size:9.3pt!important;line-height:1.22;min-height:18px;padding:4px 6px}
+ #results{padding-bottom:32mm!important}
+ #feedback-stamp{width:30mm!important;height:30mm!important}
+ body.quiz-print-fit-1{font-size:8.9pt!important;line-height:1.17!important}
+ body.quiz-print-fit-1 .printed-answer{font-size:8.9pt!important;line-height:1.17}
+ body.quiz-print-fit-1 .task{padding:4px 7px}
+ body.quiz-print-fit-2{font-size:8.5pt!important;line-height:1.13!important}
+ body.quiz-print-fit-2 .printed-answer{font-size:8.5pt!important;line-height:1.13}
+ body.quiz-print-fit-2 .task{padding:3px 6px}
+ body.quiz-print-fit-2 .feedback{padding:4px 6px}
+}
 </style></head>
 <body><header class="hero"><div class="wrap"><div class="brand"><span class="mark">✓</span>Kings Norton Girls' School · Computer Science</div><h1>Year 7 · Unit 3 <span style="color:#b9dcff">E-Safety</span></h1><p>Staying safe online · 30-question knowledge check and personalised assessment feedback</p></div></header>
 <main class="wrap shell">
@@ -82,5 +107,18 @@ $("topic-summary").replaceChildren();data.forEach(t=>{const row=el("div",undefin
 $("www").replaceChildren();$("hti").replaceChildren();const strengths=data.filter(t=>t.score/t.total>=.8),needs=data.filter(t=>t.score/t.total<.8);if(strengths.length){strengths.forEach(t=>li("www","You answered "+t.score+" out of "+t.total+" correctly in "+t.topic.toLowerCase()+"."))}else{li("www","You completed all 30 questions and identified areas for further learning.");const best=[...data].reverse()[0];li("www","Your strongest area so far is "+best.topic.toLowerCase()+" ("+best.score+"/"+best.total+").")}if(needs.length){needs.forEach(t=>li("hti","Revisit "+t.topic.toLowerCase()+" ("+t.score+"/"+t.total+") and check the explanations below."))}else{li("hti","Excellent coverage across all five areas. Explain your safe choices to someone else to check your understanding.")}li("hti","Complete your targeted improvement tasks and check each answer against the explanations.");
 $("tasks").replaceChildren();const focus=needs.length?needs.slice(0,3):data.slice(0,2);focus.forEach((t,i)=>{const card=el("div",undefined,"task");card.append(el("h3","Task "+(i+1)+" · "+t.topic));card.append(el("p",TASKS[t.topic][t.score/t.total>=.8?1:0]));const label=el("label","Your answer");label.setAttribute("for","task-answer-"+i);label.className="answer-label";const area=document.createElement("textarea");area.id="task-answer-"+i;area.className="task-answer";area.rows=5;area.placeholder="Type your answer here…";area.setAttribute("aria-label","Answer to task "+(i+1)+": "+t.topic);const printed=el("div",undefined,"printed-answer");printed.setAttribute("aria-hidden","true");area.addEventListener("input",()=>{printed.textContent=area.value||"No answer entered.";area.style.height="auto";area.style.height=Math.max(126,area.scrollHeight)+"px"});printed.textContent="No answer entered.";card.append(label,area,printed);$("tasks").append(card)});
 $("review").replaceChildren();QUESTIONS.forEach((q,i)=>{const ok=answers[i]===q.answer,card=el("div",undefined,"review "+(ok?"good":"bad"));card.append(el("strong","Q"+q.id+" · "+(ok?"✓ Correct":"✗ To revisit")+" · "+q.topic));card.append(el("p",q.q));card.append(el("p","Your answer: "+q.options[answers[i]]));if(!ok)card.append(el("p","Correct answer: "+q.options[q.answer]));card.append(el("p","Why: "+q.why));$("review").append(card)});show("results")}
-$("print").addEventListener("click",()=>window.print());$("restart").addEventListener("click",()=>{if(confirm("Start again? Your current results will be replaced.")){answers=Array(30).fill(null);show("start")}});
+function fitQuizPrint(){
+ document.body.classList.remove("quiz-print-fit-1","quiz-print-fit-2");
+ const page=document.getElementById("results");
+ if(!page)return;
+ const limit=(297-16)/25.4*96-4;
+ for(const cssClass of ["","quiz-print-fit-1","quiz-print-fit-2"]){
+  if(cssClass)document.body.classList.add(cssClass);
+  if(page.getBoundingClientRect().height<=limit)return;
+  if(cssClass)document.body.classList.remove(cssClass);
+ }
+ document.body.classList.add("quiz-print-fit-2");
+}
+$("print").addEventListener("click",()=>{fitQuizPrint();window.print()});
+window.addEventListener("beforeprint",fitQuizPrint);$("restart").addEventListener("click",()=>{if(confirm("Start again? Your current results will be replaced.")){answers=Array(30).fill(null);show("start")}});
 </script></body></html>
