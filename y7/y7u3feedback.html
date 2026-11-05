@@ -10,6 +10,30 @@
 @media(max-width:630px){.fields,.feedbackgrid{grid-template-columns:1fr}.stats{gap:7px}.stat{padding:10px}.hero{padding-bottom:45px}.topicbar strong{min-width:135px;font-size:.78rem}.option{padding:12px}}
 .answer-label{display:block;font-weight:750;font-size:.86rem;margin:10px 0 6px}.task-answer{display:block;width:100%;min-height:126px;resize:vertical;padding:12px 14px;border:1.5px solid #abbdd4;border-radius:10px;background:#fff;color:var(--ink);line-height:1.55;font:inherit;overflow:hidden}.task-answer:focus{outline:3px solid #a9cefa;outline-offset:1px}.printed-answer{display:none;white-space:pre-wrap;overflow-wrap:anywhere}
 @media print{@page{size:A4;margin:12mm}.task-answer{display:none!important}.printed-answer{display:block;white-space:pre-wrap;min-height:44px;padding:9px 10px;border:1px solid #c8d8ea;border-radius:7px}.task{break-inside:avoid}body{background:#fff;font-size:10.5pt}.hero{background:#fff;color:#102d59;padding:0 0 10px}.hero p{color:#536781}.shell{margin-top:0}.panel{border:none;box-shadow:none;padding:6px 0}.actions,.no-print,#start,#quiz{display:none!important}#results{display:block!important}.feedbackgrid{grid-template-columns:1fr 1fr}.review{font-size:9pt}.task,.review{break-inside:avoid}.print-only{display:block}}
+@media print{
+@page{size:A4 portrait;margin:8mm}
+html,body{width:100%;margin:0;padding:0;background:#fff!important;color:#172b45;font-size:8.5pt;line-height:1.28}
+.hero{padding:0 0 5px;background:#fff!important;color:#102d59!important}
+.hero .brand{font-size:8pt}.hero .mark{padding:3px 7px;background:#eef4fb;color:#102d59}
+.hero h1{font-size:17pt;margin:6px 0 2px}.hero p{font-size:8pt;color:#536781}
+.shell{padding:0;margin-top:0}.panel{margin:0;padding:5px 0;border:0;border-radius:0;box-shadow:none}
+.panel h2{font-size:12pt;margin:3px 0}.eyebrow{font-size:7pt;padding:2px 7px}
+#start,#quiz,#question-review-panel,.footer,.actions,.no-print{display:none!important}
+#results{display:block!important}
+#identity{margin:1px 0 3px}#overview{margin:4px 0}
+.stats{grid-template-columns:repeat(3,1fr);gap:7px;margin:5px 0}
+.stat{padding:6px 9px}.stat strong{font-size:16pt}.stat span{font-size:7.5pt}
+#topic-summary{display:none!important}
+.feedbackgrid{grid-template-columns:1fr 1fr;gap:8px}.feedback{padding:8px;border-radius:7px}
+.feedback h3{font-size:10pt;margin:0 0 4px}.feedback ul{padding-left:15px}
+.feedback li{margin:2px 0}
+#results>.panel:nth-child(3)>p.muted{margin:2px 0 4px;font-size:7.5pt}
+#tasks{display:grid;grid-template-columns:1fr;gap:6px}
+.task{margin:0;padding:7px 9px;border-radius:7px;break-inside:avoid}
+.task h3{font-size:9.5pt;margin:0 0 3px}.task p{margin:2px 0 4px}
+.answer-label,.task-answer{display:none!important}
+.printed-answer{display:block!important;min-height:24px;padding:5px 7px;border:1px solid #c8d8ea;border-radius:5px;font-size:8.5pt;white-space:pre-wrap;overflow-wrap:anywhere}
+}
 </style></head>
 <body><header class="hero"><div class="wrap"><div class="brand"><span class="mark">✓</span>Kings Norton Girls' School · Computer Science</div><h1>Year 7 · Unit 3 <span style="color:#b9dcff">E-Safety</span></h1><p>Staying safe online · 30-question knowledge check and personalised assessment feedback</p></div></header>
 <main class="wrap shell">
@@ -22,7 +46,7 @@
 <div class="panel"><span class="eyebrow">Step 3 · Your personalised feedback</span><h2 id="result-title">Your e-safety results</h2><p id="identity" class="muted"></p><div class="stats"><div class="stat"><strong id="score">0/30</strong><span>Questions correct</span></div><div class="stat"><strong id="percentage">0%</strong><span>Overall score</span></div><div class="stat"><strong id="topics-mastered">0/5</strong><span>Areas of strength</span></div></div><p id="overview"></p><div id="topic-summary"></div></div>
 <div class="panel"><div class="feedbackgrid"><div class="feedback"><h3>✓ WWW · What Went Well</h3><ul id="www"></ul></div><div class="feedback hti"><h3>↗ HTI · How To Improve</h3><ul id="hti"></ul></div></div></div>
 <div class="panel"><span class="eyebrow">Your next steps</span><h2>Personalised improvement activities</h2><p class="muted">Complete the activities based on the questions you found most difficult. Write your answers in the spaces provided, then print or save this page as a PDF.</p><div id="tasks"></div></div>
-<div class="panel"><h2>Question-by-question review</h2><p class="muted">Use the explanations to learn from each answer.</p><div id="review"></div><div class="actions"><button class="btn no-print" id="print" type="button">Print / save as PDF</button><button class="btn alt no-print" id="restart" type="button">Try again</button><a class="btn outline no-print" href="../index.html" style="text-decoration:none">Feedback Hub</a></div></div>
+<div class="panel" id="question-review-panel"><h2>Question-by-question review</h2><p class="muted">Use the explanations to learn from each answer.</p><div id="review"></div><div class="actions"><button class="btn no-print" id="print" type="button">Print / save as PDF</button><button class="btn alt no-print" id="restart" type="button">Try again</button><a class="btn outline no-print" href="../index.html" style="text-decoration:none">Feedback Hub</a></div></div>
 </section></main><footer class="footer">KNGS Computer Science · Learn, reflect, improve · If anything online makes you feel unsafe, speak to a trusted adult.</footer>
 <script>
 "use strict";
