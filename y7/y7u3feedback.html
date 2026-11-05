@@ -34,6 +34,14 @@ html,body{width:100%;margin:0;padding:0;background:#fff!important;color:#172b45;
 .answer-label,.task-answer{display:none!important}
 .printed-answer{display:block!important;min-height:24px;padding:5px 7px;border:1px solid #c8d8ea;border-radius:5px;font-size:8.5pt;white-space:pre-wrap;overflow-wrap:anywhere}
 }
+
+/* Physical stamp space, exactly 30 mm square on printed A4 */
+#feedback-stamp{display:none}
+@media print{
+#results{padding-bottom:33mm!important}
+#feedback-stamp{display:flex!important;position:fixed;right:0;bottom:0;width:30mm;height:30mm;border:1px dashed #7d90a7;box-sizing:border-box;align-items:flex-start;justify-content:center;background:#fff!important;break-inside:avoid;z-index:10}
+#feedback-stamp span{font:7pt/1.2 system-ui,Arial,sans-serif;color:#536781;margin-top:2mm;text-align:center}
+}
 </style></head>
 <body><header class="hero"><div class="wrap"><div class="brand"><span class="mark">✓</span>Kings Norton Girls' School · Computer Science</div><h1>Year 7 · Unit 3 <span style="color:#b9dcff">E-Safety</span></h1><p>Staying safe online · 30-question knowledge check and personalised assessment feedback</p></div></header>
 <main class="wrap shell">
@@ -47,6 +55,7 @@ html,body{width:100%;margin:0;padding:0;background:#fff!important;color:#172b45;
 <div class="panel"><div class="feedbackgrid"><div class="feedback"><h3>✓ WWW · What Went Well</h3><ul id="www"></ul></div><div class="feedback hti"><h3>↗ HTI · How To Improve</h3><ul id="hti"></ul></div></div></div>
 <div class="panel"><span class="eyebrow">Your next steps</span><h2>Personalised improvement activities</h2><p class="muted">Complete the activities based on the questions you found most difficult. Write your answers in the spaces provided, then print or save this page as a PDF.</p><div id="tasks"></div></div>
 <div class="panel" id="question-review-panel"><h2>Question-by-question review</h2><p class="muted">Use the explanations to learn from each answer.</p><div id="review"></div><div class="actions"><button class="btn no-print" id="print" type="button">Print / save as PDF</button><button class="btn alt no-print" id="restart" type="button">Try again</button><a class="btn outline no-print" href="../index.html" style="text-decoration:none">Feedback Hub</a></div></div>
+<div id="feedback-stamp" aria-label="Space for teacher feedback stamp"><span>Feedback stamp</span></div>
 </section></main><footer class="footer">KNGS Computer Science · Learn, reflect, improve · If anything online makes you feel unsafe, speak to a trusted adult.</footer>
 <script>
 "use strict";
