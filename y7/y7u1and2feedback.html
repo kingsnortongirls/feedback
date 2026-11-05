@@ -32,6 +32,16 @@ body{letter-spacing:.003em}.hero{background:radial-gradient(circle at 83% 10%,#2
   #printSheet{display:block!important;width:194mm;height:279mm;max-height:279mm;overflow:hidden;box-sizing:border-box;margin:0!important;padding:0!important;break-after:avoid;break-inside:avoid}
   .ps-title{display:flex;align-items:end;justify-content:space-between;padding-bottom:3mm;border-bottom:2pt solid #173f78;margin-bottom:3mm}
   .ps-title h1{margin:0;color:#10294f;font-size:17pt;line-height:1.05}.ps-title small{font-size:8pt;color:#54677f}
+
+  /* Distinctive folder-friendly assessment heading, with UK date */
+  .ps-title{align-items:center;gap:3mm;padding-bottom:2.4mm;margin-bottom:2.3mm}
+  .ps-heading{flex:1;min-width:0}
+  .ps-title .ps-school{display:block;font-weight:750;font-size:7.2pt;letter-spacing:.35pt;color:#50667f;margin-bottom:.6mm}
+  .ps-title h1{font-size:18pt;line-height:1.05;font-weight:800;letter-spacing:-.35pt;color:#102d59;margin:0}
+  .ps-title .ps-subject{font-size:9pt;font-weight:650;color:#244e80;line-height:1.22;margin-top:1mm}
+  .ps-title .ps-date{flex:none;min-width:27mm;text-align:right;border-left:1px solid #d4dfeb;padding-left:3mm}
+  .ps-title .ps-date strong{display:block;font-size:7.2pt;letter-spacing:.35pt;text-transform:uppercase;color:#50667f}
+  .ps-title .ps-date span{display:block;font-size:10pt;font-weight:800;color:#102d59;white-space:nowrap}
   .ps-meta{font-size:8.8pt;margin:2mm 0 3mm;color:#253956}
   .ps-score{background:#edf4fb;border:1px solid #d0e2f1;padding:2.5mm 3mm;border-radius:2mm;margin:2mm 0 3mm;font-weight:bold}
   .ps-cols{display:grid;grid-template-columns:1fr 1fr;gap:3mm;margin-bottom:3mm}
@@ -143,6 +153,7 @@ if(weak.length===0){const extension={title:'Challenge: design and explain',promp
 $('tasks').innerHTML=output.join('');for(const el of document.querySelectorAll('textarea[data-answer]')){el.value=existingAnswers[el.dataset.answer]||'';el.addEventListener('input',()=>{storage.answers=readAnswers();save()})}$('printMeta').textContent=`${name||'Student'} · ${$('studentClass').value.trim()||'Year 7'} · Target: ${$('targetGrade').value||'Not entered'} · Result: ${$('resultGrade').value||'Not entered'} · ${total}/31`;$('results').dataset.generated='true';enableStages();save();gotoStage(2);
 }
 $('generate').addEventListener('click',generate);$('edit').addEventListener('click',()=>gotoStage(3));function createPrintSheet(){
+ const printDate=new Intl.DateTimeFormat('en-GB',{day:'2-digit',month:'2-digit',year:'numeric'}).format(new Date());
  const name=$('student').value.trim()||'Student';const clazz=$('studentClass').value.trim()||'Year 7';
  const www=Array.from($('wwwList').children).map(x=>`<li>${esc(x.textContent)}</li>`).join('');
  const hti=Array.from($('htiList').children).map(x=>`<li>${esc(x.textContent)}</li>`).join('');
@@ -151,7 +162,7 @@ $('generate').addEventListener('click',generate);$('edit').addEventListener('cli
   const answer=el.querySelector('textarea').value.trim()||'Not completed yet.';
   return `<div class="ps-task"><div class="ps-topic">Task ${i+1} · ${esc(topic)}</div><strong>${esc(title)}</strong><p>${esc(prompt)}</p><div class="ps-answer"><strong>My answer: </strong>${esc(answer)}</div></div>`;
  }).join('');
- $('printSheet').innerHTML=`<div class="ps-title"><h1>KNGS | My assessment feedback</h1><small>COMPUTER SCIENCE · YEAR 7 · UNITS 1 &amp; 2</small></div>
+ $('printSheet').innerHTML=`<div class="ps-title"><div class="ps-heading"><span class="ps-school">KNGS · COMPUTER SCIENCE · ASSESSMENT FEEDBACK</span><h1>YEAR 7 · UNITS 1 &amp; 2</h1><div class="ps-subject">Computer hardware, binary and computational thinking</div></div><div class="ps-date"><strong>Date</strong><span>${printDate}</span></div></div>
  <div class="ps-meta"><strong>Name:</strong> ${esc(name)} &nbsp; <strong>Class:</strong> ${esc(clazz)} &nbsp; <strong>Target grade:</strong> ${esc($('targetGrade').value||'Not entered')} &nbsp; <strong>Assessment grade:</strong> ${esc($('resultGrade').value||'Not entered')}</div>
  <div class="ps-score">Assessment result: ${esc($('totalScore').textContent)} &nbsp; | &nbsp; ${esc($('percent').textContent)} &nbsp; | &nbsp; My next steps: complete and check the improvement tasks below.</div>
  <div class="ps-cols"><div class="ps-panel"><h2>✓ WWW · What Went Well</h2><ul>${www}</ul></div><div class="ps-panel hti"><h2>↗ HTI · How To Improve</h2><ul>${hti}</ul></div></div>
