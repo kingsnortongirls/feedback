@@ -11,8 +11,8 @@
 :root{--navy:#102d59;--blue:#185aa3;--ink:#172b45;--muted:#536781;--line:#d6e1ef;--bg:#f3f7fc;--sky:#eaf3ff;--green:#146c52;--mint:#e7f6ef;--amber:#805309;--cream:#fff5df}
 *{box-sizing:border-box}[hidden]{display:none!important}
 html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.52 system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
-button,input,textarea{font:inherit}button{cursor:pointer}a{color:var(--blue)}
-button:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid #f1b32f;outline-offset:3px}
+button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:var(--blue)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid #f1b32f;outline-offset:3px}
 .wrap{width:min(960px,calc(100% - 32px));margin-inline:auto}
 .hero{background:linear-gradient(115deg,#102c56,#185b9d);color:#fff;padding:22px 0 55px}
 .brand{display:flex;align-items:center;gap:10px;letter-spacing:.05em;font-size:.81rem;font-weight:800}
@@ -27,7 +27,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible{
 .muted{color:var(--muted)}.small{font-size:.85rem}
 .fields{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:18px 0}
 .field label,.answer-label{display:block;font-size:.94rem;font-weight:750;margin-bottom:5px}
-.field input{width:100%;border:1.5px solid #a8bbd4;border-radius:10px;background:#fff;color:var(--ink);padding:12px}
+.field input,.field select{width:100%;border:1.5px solid #a8bbd4;border-radius:10px;background:#fff;color:var(--ink);padding:12px}
 .note{background:var(--sky);border:1px solid #d5e6fb;border-radius:11px;padding:12px 15px;font-size:.92rem}
 .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:17px}
 .btn{border:0;border-radius:10px;background:var(--blue);color:#fff;font-weight:780;padding:12px 18px;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
@@ -99,7 +99,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible{
 <header class="hero"><div class="wrap"><div class="brand"><span class="logo" aria-hidden="true">✦</span>Kings Norton Girls' School · Computer Science</div><h1>Year 9 · Unit 5 <span>Artificial Intelligence</span></h1><p>Six lessons · 30-question self-marking quiz · WWW and HTI · Personalised improvement</p></div></header>
 <main class="wrap shell">
 <section id="start" class="panel"><span class="eyebrow">Step 1 · About you</span><h2>Ready to test your AI knowledge?</h2><p class="muted">Complete five questions on each of the six lessons. At the end, see your score, subject-specific strengths, areas to improve and new activities to complete before printing your feedback.</p>
-<div class="fields"><div class="field"><label for="pupil">Your name</label><input id="pupil" type="text" maxlength="90" autocomplete="name" placeholder="First name and surname" required></div><div class="field"><label for="klass">Your class</label><input id="klass" type="text" maxlength="16" placeholder="e.g. 9X1" required></div></div>
+<div class="fields"><div class="field"><label for="pupil">Your name</label><input id="pupil" type="text" maxlength="90" autocomplete="name" placeholder="First name and surname" required></div><div class="field"><label for="klass">Your class</label><select id="klass" required><option value="">Choose your class</option><option value="9X1">9X1</option><option value="9X2">9X2</option><option value="9X3">9X3</option><option value="9Y1">9Y1</option><option value="9Y2">9Y2</option><option value="9Y3">9Y3</option></select></div></div>
 <div class="note"><strong>How it works:</strong> Choose one answer per question. You can go back and change answers. Your quiz is marked after you finish. Improvement tasks must be answered before you print. Everything runs on this page; no pupil data is sent to a server.</div>
 <p id="start-error" class="error" role="alert"></p><div class="actions"><button id="begin" class="btn" type="button">Start the 30-question quiz →</button><a class="btn alt" href="../index.html">← Feedback Hub</a></div></section>
 <section id="quiz" class="panel" hidden aria-live="polite"><div class="quiztop"><span id="number" class="eyebrow">Question 1 of 30</span><span id="answered" class="small muted">0 of 30 answered</span></div><div class="progress" aria-label="Quiz progress"><div id="progressfill"></div></div><div class="quiztop"><span id="topic" class="topiclabel"></span><span id="who" class="small muted"></span></div>
