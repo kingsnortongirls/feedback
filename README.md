@@ -20,6 +20,8 @@ The aim is to help pupils understand their assessment performance, celebrate wha
 | Year | Assessment | Page |
 | --- | --- | --- |
 | Year 7 | Units 1 and 2 | [`y7/y7u1and2feedback.html`](y7/y7u1and2feedback.html) |
+| Year 9 | Unit 1: Computer Systems (40 marks) | [`y9/y9u1feedback.html`](y9/y9u1feedback.html) |
+| Year 9 | Unit 2: Computational Thinking, Algorithms and Programming (37 marks) | [`y9/y9u2feedback.html`](y9/y9u2feedback.html) |
 | GCSE (Years 10–11) | Unit 1: Systems Architecture (40 marks) | [`gcse/y10u1feedback.html`](gcse/y10u1feedback.html) |
 | GCSE (Years 10–11) | Unit 2: Data Representation (50 marks) | [`gcse/y10u2feedback.html`](gcse/y10u2feedback.html) |
 | GCSE (Years 10–11) | Unit 3: Wired & Wireless Networks (50 marks) | [`gcse/y10u3feedback.html`](gcse/y10u3feedback.html) |
