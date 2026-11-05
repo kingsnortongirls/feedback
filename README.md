@@ -20,8 +20,16 @@ The aim is to help pupils understand their assessment performance, celebrate wha
 | Year | Assessment | Page |
 | --- | --- | --- |
 | Year 7 | Units 1 and 2 | [`y7/y7u1and2feedback.html`](y7/y7u1and2feedback.html) |
+| GCSE (Years 10–11) | Unit 1: Systems Architecture (40 marks) | [`gcse/y10u1feedback.html`](gcse/y10u1feedback.html) |
+| GCSE (Years 10–11) | Unit 2: Data Representation (50 marks) | [`gcse/y10u2feedback.html`](gcse/y10u2feedback.html) |
+| GCSE (Years 10–11) | Unit 3: Wired & Wireless Networks (50 marks) | [`gcse/y10u3feedback.html`](gcse/y10u3feedback.html) |
+| GCSE (Years 10–11) | Unit 4: Network Security & Systems Software (40 marks) | [`gcse/y10u4feedback.html`](gcse/y10u4feedback.html) |
+| GCSE (Years 10–11) | Unit 5: Impacts of Digital Technology (30 marks) | [`gcse/y10u5feedback.html`](gcse/y10u5feedback.html) |
+| GCSE (Years 10–11) | Unit 6: Algorithms (50 marks) | [`gcse/y10u6feedback.html`](gcse/y10u6feedback.html) |
+| GCSE (Years 10–11) | Unit 7: Programming (60 marks) | [`gcse/y10u7feedback.html`](gcse/y10u7feedback.html) |
+| GCSE (Years 10–11) | Unit 8: Logic and Languages (60 marks) | [`gcse/y10u8feedback.html`](gcse/y10u8feedback.html) |
 
-Additional year groups and assessments can be added as separate pages.
+The [feedback homepage](index.html) groups all eight GCSE units together for Years 10 and 11. Each page uses question-part marks, personalised WWW and HTI, original improvement activities and a one-page printable reflection with a 30 mm teacher stamp area.
 
 ## How pupils use a feedback page
 
@@ -40,7 +48,7 @@ feedback/
     └── y7u1and2feedback.html
 ```
 
-As the site grows, new folders can be added for other year groups, for example `y8/`, `y9/`, `y10/` and `y11/`.
+The GCSE pages are stored together in `gcse/` so that Years 10 and 11 use a shared section. Key Stage 3 pages remain in the `y7/`, `y8/` and `y9/` folders.
 
 ## Publishing with GitHub Pages
 
