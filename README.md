@@ -30,6 +30,7 @@ The aim is to help pupils understand their assessment performance, celebrate wha
 | GCSE (Years 10–11) | Unit 6: Algorithms (50 marks) | [`gcse/y10u6feedback.html`](gcse/y10u6feedback.html) |
 | GCSE (Years 10–11) | Unit 7: Programming (60 marks) | [`gcse/y10u7feedback.html`](gcse/y10u7feedback.html) |
 | GCSE (Years 10–11) | Unit 8: Logic and Languages (60 marks) | [`gcse/y10u8feedback.html`](gcse/y10u8feedback.html) |
+| GCSE (Years 10–11) | **6-a-Day · Final Exam Sprint** (30-day self-marking practice) | [`gcse/six-a-day.html`](gcse/six-a-day.html) |
 
 The [feedback homepage](index.html) groups all eight GCSE units together for Years 10 and 11. Each page uses question-part marks, personalised WWW and HTI, original improvement activities and a one-page printable reflection with a 30 mm teacher stamp area.
 
@@ -111,3 +112,8 @@ Assessment criteria and feedback tasks should be checked whenever an exam paper,
 **Kings Norton Girls’ School | Computer Science**
 
 *Helping pupils recognise success and know how to improve.*
+
+
+### GCSE 6-a-Day final exam sprint
+
+The 6-a-Day module uses the ten supplied answer sheets (sets 03, 09, 10, 11, 13, 14, 15, 16, 17 and 19) to create **60 adapted, self-contained questions**. The original question papers were not provided, so these are parallel practice questions rather than transcriptions. Thirty days repeat the ten sets in three spaced-practice passes. All scored questions use deterministic self-marking (single choice, select-all with a guessing penalty, or exact short answers), with immediate explanations, topic-specific WWW and HTI, targeted retry, browser-only progress storage, and one-page printable feedback. The practice-mark totals do not claim to reproduce the original exam mark allocations. Legacy topics appearing in the source answer sheets are retained as supplementary retrieval content.
