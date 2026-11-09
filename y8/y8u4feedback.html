@@ -155,4 +155,4 @@ function adjustPrint(){document.body.classList.remove("compact-print");if($("res
 $("begin").addEventListener("click",begin);$("previous").addEventListener("click",()=>navigate(-1));$("next").addEventListener("click",()=>navigate(1));$("finish").addEventListener("click",finish);$("print").addEventListener("click",()=>{validateTasks();if(!$("print").disabled){adjustPrint();window.print()}});window.addEventListener("beforeprint",adjustPrint);
 $("restart").addEventListener("click",()=>{if(confirm("Start again? This clears the current answers and improvement work.")){document.body.classList.remove("compact-print");show("start")}});
 </script>
-</body></html>
+<script src="../improvement-minimum.js" defer></script></body></html>
