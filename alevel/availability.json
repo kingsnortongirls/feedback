@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "note": "Only existing assessment pages can be published. Closed assessments have a holding page, not a JavaScript overlay.",
+  "assessments": {
+    "slr1-3": false,
+    "slr4-5": false,
+    "slr6-7": false,
+    "slr9-10": false,
+    "slr11-12": false,
+    "slr13": false,
+    "slr14": false,
+    "slr15": false,
+    "slr16-17": false,
+    "slr18-22": false,
+    "slr23": false,
+    "slr24": false,
+    "slr25-26": false,
+    "y12-summer": false,
+    "y13-c1-dec": false,
+    "y13-c2": false
+  }
+}
