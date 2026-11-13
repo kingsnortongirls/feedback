@@ -27,7 +27,7 @@ function validate(raw){
   if(mark!==null&&(!Number.isFinite(mark)||mark<0||mark>1000))throw Error("Invalid mark in "+id);
   if(max!==null&&(!Number.isFinite(max)||max<=0||max>1000))throw Error("Invalid maximum mark in "+id);
   if(mark!==null&&max!==null&&mark>max)throw Error("Mark exceeds the maximum in "+id);
-  const obj={grade,mark,max,date:clean(rec.date).slice(0,20),www:clean(rec.www),hti:clean(rec.hti),reflection1:clean(rec.reflection1),reflection2:clean(rec.reflection2),updatedAt:clean(rec.updatedAt).slice(0,40),source:clean(rec.source).slice(0,60)};
+  const obj={grade,mark,max,date:clean(rec.date).slice(0,20),www:clean(rec.www),hti:clean(rec.hti),reflection1:clean(rec.reflection1),reflection2:clean(rec.reflection2),updatedAt:clean(rec.updatedAt).slice(0,40),source:clean(rec.source).slice(0,60),status:clean(rec.status).slice(0,35)||((grade||mark!==null)?"Feedback completed":"Not started")};
   if(object(rec.marks))obj.marks=Object.fromEntries(Object.entries(rec.marks).slice(0,100).map(([k,v])=>[clean(k).slice(0,50),clean(v).slice(0,20)]));
   if(object(rec.answers))obj.answers=Object.fromEntries(Object.entries(rec.answers).slice(0,20).map(([k,v])=>[clean(k).slice(0,50),clean(v)]));
   out.assessments[id]=obj;
@@ -45,19 +45,24 @@ function merge(existing,incoming,decide){
  for(const [id,rec] of Object.entries(b.assessments)){
   if(!out.assessments[id])out.assessments[id]=rec;
   else if(JSON.stringify(out.assessments[id])!==JSON.stringify(rec)){
-   if(decide("An existing "+(GROUPS.find(x=>x[0]===id)||[id,id])[1]+" result was found. Replace the current version with the imported one?"))out.assessments[id]=rec;
+   const label=(GROUPS.find(x=>x[0]===id)||[id,id])[1];
+   const describe=x=>"grade "+(x.grade||"not recorded")+", mark "+(x.mark??"–")+"/"+(x.max??"–")+", updated "+(x.updatedAt||x.date||"unknown");
+   if(decide(label+" conflict.\nCurrent: "+describe(out.assessments[id])+"\nImported: "+describe(rec)+"\n\nReplace current with imported?"))out.assessments[id]=rec;
   }
  }
  return out;
 }
 function download(data){const d=validate(data),blob=new Blob([JSON.stringify(d,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="KNGS_A_Level_Progress_"+(d.profile.student||"Student").replace(/[^a-z0-9-]/gi,"_").slice(0,45)+".json";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000)}
+function clearSession(){localStorage.removeItem(KEY);for(const k of ["kngs-h446-slr1-3-feedback-v1","kngs-h446-slr4-5-feedback-v1"])localStorage.removeItem(k);}
+function snapshot(){try{const d=load();const text=localStorage.getItem(KEY);if(text&&d.profile.student){localStorage.setItem("kngs-h446-recovery-v1",text);return true}}catch(e){}return false}
+function recover(){try{const s=localStorage.getItem("kngs-h446-recovery-v1");return s?validate(JSON.parse(s)):null}catch(e){return null}}
 function upload(file,callback){
  if(!file)return;
  if(file.size>1024*1024){callback(Error("File is too large."));return}
  const reader=new FileReader();reader.onerror=()=>callback(Error("Unable to read the file."));reader.onload=()=>{
-  try{const imported=validate(JSON.parse(reader.result));const merged=merge(load(),imported,message=>window.confirm(message));store(merged);callback(null,merged)}
+  try{const imported=validate(JSON.parse(reader.result));const merged=merge(load(),imported,message=>window.confirm(message));snapshot();store(merged);callback(null,merged)}
   catch(err){callback(err)}
  };reader.readAsText(file);
 }
-global.KNGSProgress={GROUPS,GRADE,empty,load,store,validate,merge,download,upload};
+global.KNGSProgress={GROUPS,GRADE,empty,load,store,validate,merge,download,upload,clearSession,snapshot,recover};
 })(window);
