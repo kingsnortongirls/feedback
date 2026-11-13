@@ -89,8 +89,10 @@ return {student:$("student").value.trim(),clazz:$("clazz").value,target:$("targe
 }
 function save(finished){
 const v=values();if(!v.student){if(finished)status("Enter your name first.",true);return null}
-let d=P.load(),other=d.profile.student.trim().toLocaleLowerCase("en-GB");
-if(other&&other!==v.student.toLocaleLowerCase("en-GB")){status("Another student's progress is in this browser. Restore your own file or finish the previous session first.",true);return null}
+const chosen=P.forStudent(v.student);
+if(!chosen){status("Student switch cancelled. The previous record has been preserved.",true);return null}
+if(chosen.switched){localStorage.setItem(legacyKey,JSON.stringify({student:v.student}));location.reload();return null}
+let d=chosen.record;
 const q=[...document.querySelectorAll("[data-mark]")],allMarks=q.length>0&&q.every(el=>el.value!=="");
 const improvements=[...document.querySelectorAll("[data-answer]")];
 if(finished){
@@ -114,7 +116,7 @@ function finish(){const d=save(true);if(!d)return;P.snapshot();P.download(d);sta
 $("kngs-finish").addEventListener("click",finish);
 $("kngs-draft").addEventListener("click",()=>{const d=save(false);if(d){P.download(d);status("Draft JSON downloaded. You can restore it next lesson.")}});
 $("backup")?.addEventListener("click",e=>{e.preventDefault();e.stopImmediatePropagation();finish()},true);
-let timer;document.addEventListener("input",e=>{if(e.target.matches("#student,#clazz,#target,#grade,#reflection1,#reflection2,[data-mark],[data-answer]")){clearTimeout(timer);timer=setTimeout(()=>{if(save(false))status("Autosaved in this browser. Remember to download your JSON before leaving.")},350)}},true);
+let timer;document.addEventListener("input",e=>{if(e.target.matches("#student,#clazz,#target,#grade,#reflection1,#reflection2,[data-mark],[data-answer]")){clearTimeout(timer);if(e.target.matches("#student"))return;timer=setTimeout(()=>{if(save(false))status("Autosaved in this browser. Remember to download your JSON before leaving.")},350)}},true);
 document.addEventListener("change",e=>{if(e.target.matches("#student,#clazz,#target,#grade,[data-mark]")){if(save(false))status("Autosaved in this browser.")}},true);
 function hydrate(d){
 const r=d.assessments[key];const legacy={student:d.profile.student,clazz:d.profile.clazz,target:d.profile.target,grade:r?.grade||"",marks:r?.marks||{},answers:r?.answers||{},reflection1:r?.reflection1||"",reflection2:r?.reflection2||""};
