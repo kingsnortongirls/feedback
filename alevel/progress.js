@@ -53,7 +53,7 @@ function merge(existing,incoming,decide){
  return out;
 }
 function download(data){const d=validate(data),blob=new Blob([JSON.stringify(d,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="KNGS_A_Level_Progress_"+(d.profile.student||"Student").replace(/[^a-z0-9-]/gi,"_").slice(0,45)+".json";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000)}
-function clearSession(){localStorage.removeItem(KEY);for(const k of ["kngs-h446-slr1-3-feedback-v1","kngs-h446-slr4-5-feedback-v1"])localStorage.removeItem(k);}
+function clearSession(){localStorage.removeItem(KEY);localStorage.removeItem("kngs-h446-recovery-v1");for(const k of ["kngs-h446-slr1-3-feedback-v1","kngs-h446-slr4-5-feedback-v1"])localStorage.removeItem(k);}
 function snapshot(){try{const d=load();const text=localStorage.getItem(KEY);if(text&&d.profile.student){localStorage.setItem("kngs-h446-recovery-v1",text);return true}}catch(e){}return false}
 function recover(){try{const s=localStorage.getItem("kngs-h446-recovery-v1");return s?validate(JSON.parse(s)):null}catch(e){return null}}
 function upload(file,callback){
