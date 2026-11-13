@@ -27,7 +27,7 @@
  const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
  const opts='<option value="">–</option>'+P.GRADE.map(g=>'<option>'+g+'</option>').join("");
  $('target').innerHTML='<option value="">Choose</option>'+P.GRADE.map(g=>'<option>'+g+'</option>').join("");
- const knownPages={"slr1-3":"slr1-3feedback.html","slr4-5":"slr4-5feedback.html"};
+ const knownPages={"slr1-3":"slr1-3feedback.html","slr4-5":"slr4-5feedback.html","slr11-12":"slr11-12feedback.html"};
  const available={};
  function refreshAvailable(){const choices=Object.entries(available);$('nextAssessments').innerHTML=choices.map(([id,url])=>'<a class="btn" href="'+url+'">'+esc(labels[id])+' feedback →</a>').join("");$('nextStatus').textContent=choices.length?"Only assessments released by your teacher are linked. Enter a teacher-awarded grade for each assessment to display it on the chart.":"Feedback activities are currently closed. You can continue recording results below.";}
  refreshAvailable();
