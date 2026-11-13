@@ -49,4 +49,51 @@ $('generate').addEventListener('click',generate);$('clear').addEventListener('cl
 $('print').addEventListener('click',()=>{const issues=[...document.querySelectorAll('[data-answer]')].filter(t=>t.value.trim().split(/\s+/).filter(Boolean).length<20);if(issues.length){$('printError').textContent='Both improvement answers need at least 20 words before printing.';issues[0].focus();return}$('printError').textContent='';persist();printSheet();window.print()});
 $('backup').addEventListener('click',()=>{persist();const b=new Blob([JSON.stringify(current(),null,2)],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='A_Level_SLR4-5_Feedback.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),2000)});
 window.addEventListener('beforeprint',()=>{if(!$('results').hidden)printSheet()});progress();
-</script></body></html>
+</script>
+<script src="progress.js"></script>
+<script>
+(function(){
+ "use strict";
+ const P=window.KNGSProgress, key=document.title.includes("1–3")?"slr1-3":"slr4-5";
+ const legacyKey=key==="slr1-3"?"kngs-h446-slr1-3-feedback-v1":"kngs-h446-slr4-5-feedback-v1";
+ const section=document.createElement("section");section.className="panel screenOnly";
+ section.innerHTML='<h2>My A Level Progress Record</h2><p class="muted">Before starting, upload your previous combined progress JSON. Your details and this assessment will be restored where available. After completing feedback, download an updated combined file to your school OneDrive. Your file stays in this browser; it is not sent to GitHub.</p><div class="actions"><label style="max-width:300px">Restore / merge JSON<input type="file" id="kngs-import" accept=".json,application/json"></label><button type="button" class="secondary" id="kngs-export">Download combined progress JSON</button><a style="display:inline-flex;align-items:center;padding:10px" href="progress.html">View full progress tracker →</a></div><p id="kngs-status" role="status" class="muted" style="margin-top:12px"></p>';
+ const main=document.querySelector("main.wrap");main.insertBefore(section,main.firstElementChild);
+ const $=x=>document.getElementById(x), status=(s,bad)=>{const n=$("kngs-status");n.textContent=s;n.style.color=bad?"#ad2929":"#146c52"};
+ function fields(){const obj={},marks={};document.querySelectorAll("[data-mark]").forEach(s=>marks[s.dataset.mark]=s.value);
+  document.querySelectorAll("[data-answer]").forEach(s=>(obj[s.dataset.answer]=s.value));
+  return {student:$("student").value.trim(),clazz:$("clazz").value,target:$("target").value,grade:$("grade").value,marks,answers:obj,reflection1:$("reflection1").value,reflection2:$("reflection2").value};
+ }
+ function saveProgress(){
+  const form=fields(),doc=P.load();
+  if(!form.student){status("Enter your name before saving your combined progress file.",true);return null}
+  const existing=doc.profile.student.trim().toLocaleLowerCase("en-GB");
+  if(existing&&existing!==form.student.toLocaleLowerCase("en-GB")){status("This browser has another student's record. Upload your own JSON on the progress tracker before saving.",true);return null}
+  doc.profile={student:form.student,clazz:form.clazz||doc.profile.clazz,target:form.target||doc.profile.target};
+  const options=[...document.querySelectorAll("[data-mark]")],complete=options.length&&options.every(e=>e.value!=="");
+  if(complete){
+   const max=options.reduce((a,e)=>a+Number(e.options.length-2),0);
+   const mark=options.reduce((a,e)=>a+Number(e.value),0);
+   const texts=id=>{const el=$(id);return el?[...el.children].map(e=>e.textContent.trim()).join("\n"):""};
+   doc.assessments[key]={grade:form.grade,mark,max,date:new Date().toISOString().slice(0,10),www:texts("www"),hti:texts("hti"),reflection1:form.reflection1,reflection2:form.reflection2,marks:form.marks,answers:form.answers,updatedAt:new Date().toISOString(),source:"A Level Feedback Hub"};
+  }else{status("Student details saved, but the current assessment is not yet complete. Enter every question mark before exporting its result.",true)}
+  try{return P.store(doc)}catch(err){status("Unable to save progress: "+err.message,true);return null}
+ }
+ $("kngs-export").addEventListener("click",()=>{const d=saveProgress();if(d){P.download(d);status("Combined progress JSON downloaded. Save it to your school OneDrive.")}});
+ $("backup")?.addEventListener("click",e=>{e.stopImmediatePropagation();const d=saveProgress();if(d){P.download(d);status("Combined progress JSON downloaded.")}},true);
+ $("kngs-import").addEventListener("change",e=>P.upload(e.target.files[0],(err,doc)=>{
+  if(err){status(err.message,true);e.target.value="";return}
+  if(doc.assessments[key]){
+   const r=doc.assessments[key];const current={student:doc.profile.student,clazz:doc.profile.clazz,target:doc.profile.target,grade:r.grade||"",marks:r.marks||{},answers:r.answers||{},reflection1:r.reflection1||"",reflection2:r.reflection2||""};
+   localStorage.setItem(legacyKey,JSON.stringify(current));
+  }else{
+   const prior=JSON.parse(localStorage.getItem(legacyKey)||"{}");
+   prior.student=doc.profile.student||prior.student;prior.clazz=doc.profile.clazz||prior.clazz;prior.target=doc.profile.target||prior.target;
+   localStorage.setItem(legacyKey,JSON.stringify(prior));
+  }
+  status("Progress imported and merged. Restoring your assessment details…");location.reload();
+ }));
+ const d=P.load();if(d.profile.student)status("Saved progress found for "+d.profile.student+". Upload your latest JSON if you have worked on another device.");
+})();
+</script>
+</body></html>
