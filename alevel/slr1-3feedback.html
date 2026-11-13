@@ -107,9 +107,8 @@ window.addEventListener('beforeprint',()=>{if(!$('results').hidden)printSheet()}
    const r=doc.assessments[key];const current={student:doc.profile.student,clazz:doc.profile.clazz,target:doc.profile.target,grade:r.grade||"",marks:r.marks||{},answers:r.answers||{},reflection1:r.reflection1||"",reflection2:r.reflection2||""};
    localStorage.setItem(legacyKey,JSON.stringify(current));
   }else{
-   const prior=JSON.parse(localStorage.getItem(legacyKey)||"{}");
-   prior.student=doc.profile.student||prior.student;prior.clazz=doc.profile.clazz||prior.clazz;prior.target=doc.profile.target||prior.target;
-   localStorage.setItem(legacyKey,JSON.stringify(prior));
+   const current={student:doc.profile.student,clazz:doc.profile.clazz,target:doc.profile.target,grade:"",marks:{},answers:{},reflection1:"",reflection2:""};
+   localStorage.setItem(legacyKey,JSON.stringify(current));
   }
   status("Progress imported and merged. Restoring your assessment details…");location.reload();
  }));
