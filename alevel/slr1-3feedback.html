@@ -73,46 +73,62 @@ window.addEventListener('beforeprint',()=>{if(!$('results').hidden)printSheet()}
 <script src="progress.js"></script>
 <script>
 (function(){
- "use strict";
- const P=window.KNGSProgress, key=document.title.includes("1–3")?"slr1-3":"slr4-5";
- const legacyKey=key==="slr1-3"?"kngs-h446-slr1-3-feedback-v1":"kngs-h446-slr4-5-feedback-v1";
- const section=document.createElement("section");section.className="panel screenOnly";
- section.innerHTML='<h2>My A Level Progress Record</h2><p class="muted">Before starting, upload your previous combined progress JSON. Your details and this assessment will be restored where available. After completing feedback, download an updated combined file to your school OneDrive. Your file stays in this browser; it is not sent to GitHub.</p><div class="actions"><label style="max-width:300px">Restore / merge JSON<input type="file" id="kngs-import" accept=".json,application/json"></label><button type="button" class="secondary" id="kngs-export">Download combined progress JSON</button><a style="display:inline-flex;align-items:center;padding:10px" href="progress.html">View full progress tracker →</a></div><p id="kngs-status" role="status" class="muted" style="margin-top:12px"></p>';
- const main=document.querySelector("main.wrap");main.insertBefore(section,main.firstElementChild);
- const $=x=>document.getElementById(x), status=(s,bad)=>{const n=$("kngs-status");n.textContent=s;n.style.color=bad?"#ad2929":"#146c52"};
- function fields(){const obj={},marks={};document.querySelectorAll("[data-mark]").forEach(s=>marks[s.dataset.mark]=s.value);
-  document.querySelectorAll("[data-answer]").forEach(s=>(obj[s.dataset.answer]=s.value));
-  return {student:$("student").value.trim(),clazz:$("clazz").value,target:$("target").value,grade:$("grade").value,marks,answers:obj,reflection1:$("reflection1").value,reflection2:$("reflection2").value};
- }
- function saveProgress(){
-  const form=fields(),doc=P.load();
-  if(!form.student){status("Enter your name before saving your combined progress file.",true);return null}
-  const existing=doc.profile.student.trim().toLocaleLowerCase("en-GB");
-  if(existing&&existing!==form.student.toLocaleLowerCase("en-GB")){status("This browser has another student's record. Upload your own JSON on the progress tracker before saving.",true);return null}
-  doc.profile={student:form.student,clazz:form.clazz||doc.profile.clazz,target:form.target||doc.profile.target};
-  const options=[...document.querySelectorAll("[data-mark]")],complete=options.length&&options.every(e=>e.value!=="");
-  if(complete){
-   const max=options.reduce((a,e)=>a+Number(e.options.length-2),0);
-   const mark=options.reduce((a,e)=>a+Number(e.value),0);
-   const texts=id=>{const el=$(id);return el?[...el.children].map(e=>e.textContent.trim()).join("\n"):""};
-   doc.assessments[key]={grade:form.grade,mark,max,date:new Date().toISOString().slice(0,10),www:texts("www"),hti:texts("hti"),reflection1:form.reflection1,reflection2:form.reflection2,marks:form.marks,answers:form.answers,updatedAt:new Date().toISOString(),source:"A Level Feedback Hub"};
-  }else{status("Student details saved, but the current assessment is not yet complete. Enter every question mark before exporting its result.",true)}
-  try{return P.store(doc)}catch(err){status("Unable to save progress: "+err.message,true);return null}
- }
- $("kngs-export").addEventListener("click",()=>{const d=saveProgress();if(d){P.download(d);status("Combined progress JSON downloaded. Save it to your school OneDrive.")}});
- $("backup")?.addEventListener("click",e=>{e.stopImmediatePropagation();const d=saveProgress();if(d){P.download(d);status("Combined progress JSON downloaded.")}},true);
- $("kngs-import").addEventListener("change",e=>P.upload(e.target.files[0],(err,doc)=>{
-  if(err){status(err.message,true);e.target.value="";return}
-  if(doc.assessments[key]){
-   const r=doc.assessments[key];const current={student:doc.profile.student,clazz:doc.profile.clazz,target:doc.profile.target,grade:r.grade||"",marks:r.marks||{},answers:r.answers||{},reflection1:r.reflection1||"",reflection2:r.reflection2||""};
-   localStorage.setItem(legacyKey,JSON.stringify(current));
-  }else{
-   const current={student:doc.profile.student,clazz:doc.profile.clazz,target:doc.profile.target,grade:"",marks:{},answers:{},reflection1:"",reflection2:""};
-   localStorage.setItem(legacyKey,JSON.stringify(current));
-  }
-  status("Progress imported and merged. Restoring your assessment details…");location.reload();
- }));
- const d=P.load();if(d.profile.student)status("Saved progress found for "+d.profile.student+". Upload your latest JSON if you have worked on another device.");
+"use strict";
+const P=window.KNGSProgress,key=location.pathname.includes("slr1-3")?"slr1-3":"slr4-5";
+const legacyKey=key==="slr1-3"?"kngs-h446-slr1-3-feedback-v1":"kngs-h446-slr4-5-feedback-v1";
+const $=id=>document.getElementById(id);
+const area=document.createElement("section");area.className="panel screenOnly";
+area.innerHTML='<h2>My A Level progress · save and restore</h2><p class="muted">Your work saves automatically in this browser. Restore your latest combined JSON at the start of the session if you worked elsewhere. When finished, download the updated file and save it to your school OneDrive.</p><div class="actions"><label style="max-width:290px">Restore or merge JSON<input id="kngs-import" type="file" accept=".json,application/json"></label><button type="button" class="secondary" id="kngs-finish">Finish feedback and download progress JSON</button><button type="button" class="secondary" id="kngs-draft">Download draft JSON</button><a style="padding:10px" href="progress.html">My complete progress record →</a></div><p id="kngs-status" role="status" class="muted"></p>';
+document.querySelector("main.wrap").insertBefore(area,document.querySelector("main.wrap").firstElementChild);
+const status=(message,bad)=>{const n=$("kngs-status");n.textContent=message;n.style.color=bad?"#a83227":"#146c52"};
+const wordCount=x=>x.trim().split(/\s+/).filter(Boolean).length;
+function values(){
+const marks={},answers={};document.querySelectorAll("[data-mark]").forEach(el=>marks[el.dataset.mark]=el.value);
+document.querySelectorAll("[data-answer]").forEach(el=>answers[el.dataset.answer]=el.value);
+return {student:$("student").value.trim(),clazz:$("clazz").value,target:$("target").value,grade:$("grade").value,marks,answers,reflection1:$("reflection1").value,reflection2:$("reflection2").value};
+}
+function save(finished){
+const v=values();if(!v.student){if(finished)status("Enter your name first.",true);return null}
+let d=P.load(),other=d.profile.student.trim().toLocaleLowerCase("en-GB");
+if(other&&other!==v.student.toLocaleLowerCase("en-GB")){status("Another student's progress is in this browser. Restore your own file or finish the previous session first.",true);return null}
+const q=[...document.querySelectorAll("[data-mark]")],allMarks=q.length>0&&q.every(el=>el.value!=="");
+const improvements=[...document.querySelectorAll("[data-answer]")];
+if(finished){
+if(!allMarks){status("Enter marks for every question before finishing.",true);return null}
+if(!v.grade||!v.target||!v.clazz){status("Select your year group, target grade and teacher-awarded assessment grade.",true);return null}
+if($("results").hidden){status("Generate your personalised feedback before finishing.",true);return null}
+if(improvements.length<2||improvements.some(el=>wordCount(el.value)<20)){status("Complete both improvement answers with at least 20 words each.",true);improvements.find(el=>wordCount(el.value)<20)?.focus();return null}
+if(!v.reflection1.trim()||!v.reflection2.trim()){status("Complete both reflection boxes before finishing.",true);return null}
+}
+d.profile={student:v.student,clazz:v.clazz||d.profile.clazz,target:v.target||d.profile.target};
+const existing=d.assessments[key]||{};
+const marksDone=q.reduce((a,el)=>a+(el.value===""?0:1),0);
+const total=q.reduce((a,el)=>a+(Number(el.value)||0),0);
+const max=q.reduce((a,el)=>a+el.options.length-2,0);
+const texts=id=>{const n=$(id);return n&&(!$("results").hidden)?[...n.children].map(x=>x.textContent.trim()).join("\n"):""};
+const rec={...existing,grade:v.grade||existing.grade||"",mark:allMarks?total:null,max:max||existing.max||null,date:existing.date||new Date().toISOString().slice(0,10),www:texts("www")||existing.www||"",hti:texts("hti")||existing.hti||"",reflection1:v.reflection1,reflection2:v.reflection2,marks:v.marks,answers:v.answers,updatedAt:new Date().toISOString(),source:"A Level Feedback Hub",status:finished?"Improvements completed":allMarks&&!$("results").hidden?"Feedback completed":"In progress"};
+d.assessments[key]=rec;
+try{P.store(d);return d}catch(err){status("Could not save: "+err.message,true);return null}
+}
+function finish(){const d=save(true);if(!d)return;P.snapshot();P.download(d);status("Assessment complete. Updated combined JSON downloaded. Save it to your school OneDrive before signing out.");}
+$("kngs-finish").addEventListener("click",finish);
+$("kngs-draft").addEventListener("click",()=>{const d=save(false);if(d){P.download(d);status("Draft JSON downloaded. You can restore it next lesson.")}});
+$("backup")?.addEventListener("click",e=>{e.preventDefault();e.stopImmediatePropagation();finish()},true);
+let timer;document.addEventListener("input",e=>{if(e.target.matches("#student,#clazz,#target,#grade,#reflection1,#reflection2,[data-mark],[data-answer]")){clearTimeout(timer);timer=setTimeout(()=>{if(save(false))status("Autosaved in this browser. Remember to download your JSON before leaving.")},350)}},true);
+document.addEventListener("change",e=>{if(e.target.matches("#student,#clazz,#target,#grade,[data-mark]")){if(save(false))status("Autosaved in this browser.")}},true);
+function hydrate(d){
+const r=d.assessments[key];const legacy={student:d.profile.student,clazz:d.profile.clazz,target:d.profile.target,grade:r?.grade||"",marks:r?.marks||{},answers:r?.answers||{},reflection1:r?.reflection1||"",reflection2:r?.reflection2||""};
+localStorage.setItem(legacyKey,JSON.stringify(legacy));location.reload();
+}
+$("kngs-import").addEventListener("change",e=>{P.upload(e.target.files[0],(err,d)=>{e.target.value="";if(err){status(err.message,true);return}hydrate(d)})});
+const current=P.load(),legacy=JSON.parse(localStorage.getItem(legacyKey)||"{}");
+if(current.profile.student&&(!legacy.student||legacy.student.toLocaleLowerCase("en-GB")!==current.profile.student.toLocaleLowerCase("en-GB"))){
+const r=current.assessments[key];const v={student:current.profile.student,clazz:current.profile.clazz,target:current.profile.target,grade:r?.grade||"",marks:r?.marks||{},answers:r?.answers||{},reflection1:r?.reflection1||"",reflection2:r?.reflection2||""};
+for(const field of ["student","clazz","target","grade","reflection1","reflection2"])if($(field)&&v[field])$(field).value=v[field];
+document.querySelectorAll("[data-mark]").forEach(el=>{if(v.marks[el.dataset.mark]!==undefined)el.value=v.marks[el.dataset.mark]});
+localStorage.setItem(legacyKey,JSON.stringify(v));
+}
+if(current.profile.student)status("Progress loaded for "+current.profile.student+". You can continue or upload your latest JSON.");
 })();
 </script>
 </body></html>
