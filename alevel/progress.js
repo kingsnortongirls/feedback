@@ -39,7 +39,7 @@ function store(data){const d=validate(data);d.updatedAt=new Date().toISOString()
 function merge(existing,incoming,decide){
  const a=validate(existing),b=validate(incoming);
  const na=a.profile.student.trim().toLocaleLowerCase("en-GB"),nb=b.profile.student.trim().toLocaleLowerCase("en-GB");
- if(na&&nb&&na!==nb)throw Error("The student names do not match. Check that you have selected your own progress file.");
+ if(na&&nb&&na!==nb){if(decide("This browser contains progress for another student. Replace the browser record with the imported student record? (The existing record will no longer be available here unless previously downloaded.)"))return validate(b);throw Error("Import cancelled because the student names differ.");}
  const out=validate(a);
  for(const k of ["student","clazz","target"]){if(!out.profile[k]&&b.profile[k])out.profile[k]=b.profile[k];else if(out.profile[k]&&b.profile[k]&&out.profile[k]!==b.profile[k]){if(decide("Update "+k+" from '"+out.profile[k]+"' to '"+b.profile[k]+"'?"))out.profile[k]=b.profile[k]}}
  for(const [id,rec] of Object.entries(b.assessments)){
