@@ -15,6 +15,7 @@ const VALID=new Set(GROUPS.map(x=>x[0]));
 const object=x=>x&&typeof x==="object"&&!Array.isArray(x);
 const clean=x=>String(x??"").trim().slice(0,10000);
 const profile=()=>({student:"",clazz:"",target:""});
+const normalName=x=>clean(x).replace(/\s+/g," ").toLocaleLowerCase("en-GB");
 const empty=()=>({format:"kngs-h446-progress",version:VERSION,profile:profile(),assessments:{},updatedAt:new Date().toISOString()});
 function validate(raw){
  if(!object(raw)||raw.format!=="kngs-h446-progress"||raw.version!==VERSION||!object(raw.profile)||!object(raw.assessments))throw Error("This is not a supported KNGS A Level progress file (version 1).");
@@ -38,7 +39,7 @@ function load(){try{return validate(JSON.parse(localStorage.getItem(KEY)||"null"
 function store(data){const d=validate(data);d.updatedAt=new Date().toISOString();localStorage.setItem(KEY,JSON.stringify(d));return d}
 function merge(existing,incoming,decide){
  const a=validate(existing),b=validate(incoming);
- const na=a.profile.student.trim().toLocaleLowerCase("en-GB"),nb=b.profile.student.trim().toLocaleLowerCase("en-GB");
+ const na=normalName(a.profile.student),nb=normalName(b.profile.student);
  if(na&&nb&&na!==nb){if(decide("This browser contains progress for another student. Replace the browser record with the imported student record? (The existing record will no longer be available here unless previously downloaded.)"))return validate(b);throw Error("Import cancelled because the student names differ.");}
  const out=validate(a);
  for(const k of ["student","clazz","target"]){if(!out.profile[k]&&b.profile[k])out.profile[k]=b.profile[k];else if(out.profile[k]&&b.profile[k]&&out.profile[k]!==b.profile[k]){if(decide("Update "+k+" from '"+out.profile[k]+"' to '"+b.profile[k]+"'?"))out.profile[k]=b.profile[k]}}
@@ -53,16 +54,27 @@ function merge(existing,incoming,decide){
  return out;
 }
 function download(data){const d=validate(data),blob=new Blob([JSON.stringify(d,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="KNGS_A_Level_Progress_"+(d.profile.student||"Student").replace(/[^a-z0-9-]/gi,"_").slice(0,45)+".json";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000)}
-function clearSession(){localStorage.removeItem(KEY);localStorage.removeItem("kngs-h446-recovery-v1");for(const k of ["kngs-h446-slr1-3-feedback-v1","kngs-h446-slr4-5-feedback-v1"])localStorage.removeItem(k);}
+function clearSession(){localStorage.removeItem(KEY);localStorage.removeItem("kngs-h446-recovery-v1");for(const k of ["kngs-h446-slr1-3-feedback-v1","kngs-h446-slr4-5-feedback-v1","kngs-h446-slr11-12-feedback-v1"])localStorage.removeItem(k);}
+function forStudent(student){
+ const current=load();
+ if(!normalName(student)||!normalName(current.profile.student)||normalName(current.profile.student)===normalName(student))return {record:current,switched:false};
+ if(!window.confirm("This browser currently contains progress for "+current.profile.student+".\n\nSwitch to "+clean(student)+"? This clears the previous student's browser record and feedback drafts. Make sure they have downloaded their JSON first.\n\nYour own JSON can then be imported."))return null;
+ clearSession();
+ return {record:empty(),switched:true};
+}
 function snapshot(){try{const d=load();const text=localStorage.getItem(KEY);if(text&&d.profile.student){localStorage.setItem("kngs-h446-recovery-v1",text);return true}}catch(e){}return false}
 function recover(){try{const s=localStorage.getItem("kngs-h446-recovery-v1");return s?validate(JSON.parse(s)):null}catch(e){return null}}
 function upload(file,callback){
  if(!file)return;
  if(file.size>1024*1024){callback(Error("File is too large."));return}
  const reader=new FileReader();reader.onerror=()=>callback(Error("Unable to read the file."));reader.onload=()=>{
-  try{const imported=validate(JSON.parse(reader.result));const merged=merge(load(),imported,message=>window.confirm(message));snapshot();store(merged);callback(null,merged)}
+  try{const imported=validate(JSON.parse(reader.result)),current=load();
+  const different=normalName(current.profile.student)&&normalName(imported.profile.student)&&normalName(current.profile.student)!==normalName(imported.profile.student);
+  const merged=merge(current,imported,message=>window.confirm(message));
+  if(different)clearSession();else snapshot();
+  store(merged);callback(null,merged)}
   catch(err){callback(err)}
  };reader.readAsText(file);
 }
-global.KNGSProgress={GROUPS,GRADE,empty,load,store,validate,merge,download,upload,clearSession,snapshot,recover};
+global.KNGSProgress={GROUPS,GRADE,empty,load,store,validate,merge,download,upload,clearSession,forStudent,snapshot,recover};
 })(window);
