@@ -131,9 +131,9 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     <div class="cardtop"><span class="glyph" aria-hidden="true">A</span><span class="status">Available</span></div>
     <h4>SLR 1–3 · Components of a Computer</h4>
     <p>50-mark question-level analysis across processor components, processor types and storage. Personalised WWW and HTI, original improvements and targeted revision links.</p>
-    <a href="alevel/slr1-3feedback.html">Open feedback <span aria-hidden="true">→</span></a>
+    <a data-alevel-availability="slr1-3" href="alevel/slr1-3feedback.html" hidden>Open feedback <span aria-hidden="true">→</span></a><span class="unavailable" data-alevel-closed="slr1-3">🔒 Feedback available after assessment</span>
    </article>
-   <article class="card available" data-card data-search="a level year 12 year 13 computer science h446 slr4 slr5 systems software applications operating systems memory paging interrupts scheduling bytecode virtual machine compilation"><div class="cardtop"><span class="glyph" aria-hidden="true">A</span><span class="status">Available</span></div><h4>SLR 4 &amp; 5 · Systems Software and Applications</h4><p>50-mark OCR H446 question-level analysis, personalised WWW and HTI, original exam-style improvements and linked revision support.</p><a href="alevel/slr4-5feedback.html">Open feedback <span aria-hidden="true">→</span></a></article>
+   <article class="card available" data-card data-search="a level year 12 year 13 computer science h446 slr4 slr5 systems software applications operating systems memory paging interrupts scheduling bytecode virtual machine compilation"><div class="cardtop"><span class="glyph" aria-hidden="true">A</span><span class="status">Available</span></div><h4>SLR 4 &amp; 5 · Systems Software and Applications</h4><p>50-mark OCR H446 question-level analysis, personalised WWW and HTI, original exam-style improvements and linked revision support.</p><a data-alevel-availability="slr4-5" href="alevel/slr4-5feedback.html" hidden>Open feedback <span aria-hidden="true">→</span></a><span class="unavailable" data-alevel-closed="slr4-5">🔒 Feedback available after assessment</span></article>
   </div></section>
  </div>
  <div class="empty" id="empty" role="status">No assessments match your search. Try a year group or a different keyword.</div>
@@ -154,6 +154,13 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
   });
   empty.style.display=visible?'none':'block';
  });
+})();
+</script>
+<script>
+(function(){
+ fetch("alevel/availability.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw Error("status unavailable");return r.json()}).then(settings=>{
+   for(const id of ["slr1-3","slr4-5"]){const open=settings.assessments?.[id]===true;const a=document.querySelector('[data-alevel-availability="'+id+'"]');const closed=document.querySelector('[data-alevel-closed="'+id+'"]');if(a)a.hidden=!open;if(closed)closed.hidden=open}
+ }).catch(()=>{ /* fail closed */ });
 })();
 </script>
 </body></html>
