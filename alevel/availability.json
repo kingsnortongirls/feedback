@@ -3,7 +3,7 @@
   "note": "Only existing assessment pages can be published. Closed assessments have a holding page, not a JavaScript overlay.",
   "assessments": {
     "slr1-3": false,
-    "slr4-5": false,
+    "slr4-5": true,
     "slr6-7": false,
     "slr9-10": false,
     "slr11-12": false,
