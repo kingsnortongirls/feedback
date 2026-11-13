@@ -1,0 +1,79 @@
+name: Set A Level assessment availability
+
+on:
+  workflow_dispatch:
+    inputs:
+      assessment:
+        description: Assessment to open or close
+        required: true
+        type: choice
+        options:
+          - slr1-3
+          - slr4-5
+          - all-published
+      availability:
+        description: Make assessment available to students?
+        required: true
+        type: choice
+        options:
+          - closed
+          - open
+
+permissions:
+  contents: write
+
+concurrency:
+  group: alevel-assessment-availability
+  cancel-in-progress: false
+
+jobs:
+  update-availability:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Publish or withdraw assessment pages
+        env:
+          ASSESSMENT: ${{ inputs.assessment }}
+          AVAILABILITY: ${{ inputs.availability }}
+        run: |
+          python3 - <<'PY'
+          import json, os, pathlib, subprocess, html
+          root=pathlib.Path(".")
+          revision="7937d5337c82b54ef90e26af1d70c112d7fa3ab4"
+          pages={
+            "slr1-3": ("SLR 1–3","alevel/slr1-3feedback.html"),
+            "slr4-5": ("SLR 4–5","alevel/slr4-5feedback.html")
+          }
+          selected=os.environ["ASSESSMENT"]
+          selected=list(pages) if selected=="all-published" else [selected]
+          available=os.environ["AVAILABILITY"]=="open"
+          configfile=root/"alevel/availability.json"
+          config=json.loads(configfile.read_text(encoding="utf-8"))
+          for ident in selected:
+            if ident not in pages:
+              raise SystemExit("This assessment does not have a published feedback page yet: "+ident)
+            name,path=pages[ident]
+            if available:
+              source=subprocess.check_output(["git","show",f"{revision}:{path}"])
+              (root/path).write_bytes(source)
+            else:
+              content=f"""<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>KNGS | {html.escape(name)} Feedback Unavailable</title><style>body{{margin:0;background:#f3f7fc;color:#172b45;font:16px/1.6 system-ui,Arial,sans-serif}}header{{background:#102d59;color:white;padding:35px 20px}}main{{max-width:700px;margin:35px auto;padding:25px;background:white;border:1px solid #d6e1ef;border-radius:16px}}a{{color:#185aa3}}h1{{margin:0}}p{{margin:12px 0}}</style></head><body><header><h1>KNGS · A Level Computer Science</h1></header><main><h2>{html.escape(name)} feedback is not currently available</h2><p>Your teacher will make this feedback activity available after the assessment. You can still record your grade and review your progress in the A Level tracker.</p><p><a href="progress.html">Open my progress tracker</a> · <a href="../index.html">Return to Feedback Hub</a></p></main></body></html>"""
+              (root/path).write_text(content,encoding="utf-8")
+            config["assessments"][ident]=available
+          configfile.write_text(json.dumps(config,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
+          print("Updated",", ".join(selected),"to",os.environ["AVAILABILITY"])
+          PY
+      - name: Commit updated site
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add alevel/availability.json alevel/slr1-3feedback.html alevel/slr4-5feedback.html
+          if git diff --cached --quiet; then
+            echo "No changes required"
+          else
+            git commit -m "Set A Level assessment ${{ inputs.assessment }} to ${{ inputs.availability }}"
+            git push origin HEAD:main
+          fi
