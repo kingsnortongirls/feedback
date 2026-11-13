@@ -13,9 +13,11 @@
  const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
  const opts='<option value="">–</option>'+P.GRADE.map(g=>'<option>'+g+'</option>').join("");
  $('target').innerHTML='<option value="">Choose</option>'+P.GRADE.map(g=>'<option>'+g+'</option>').join("");
- const available={"slr1-3":"slr1-3feedback.html","slr4-5":"slr4-5feedback.html"};
- $('nextAssessments').innerHTML=Object.entries(available).map(([id,url])=>'<a class="btn" href="'+url+'">'+esc(labels[id])+' feedback →</a>').join("");
- $('nextStatus').textContent="All 16 results can be recorded here; only published feedback pages are linked.";
+ const knownPages={"slr1-3":"slr1-3feedback.html","slr4-5":"slr4-5feedback.html"};
+ const available={};
+ function refreshAvailable(){const choices=Object.entries(available);$('nextAssessments').innerHTML=choices.map(([id,url])=>'<a class="btn" href="'+url+'">'+esc(labels[id])+' feedback →</a>').join("");$('nextStatus').textContent=choices.length?"Only assessments released by your teacher are linked. Other results can be recorded below.":"Feedback activities are currently closed. You can continue recording your results and progress below.";}
+ refreshAvailable();
+ fetch("availability.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw Error("Status unavailable");return r.json()}).then(conf=>{for(const id of Object.keys(knownPages)){if(conf.assessments?.[id]===true)available[id]=knownPages[id];else delete available[id]}refreshAvailable();populate()}).catch(()=>{refreshAvailable()});
  const status=(message,bad=false)=>{$('status').textContent=message;$('status').className=bad?"warn":"on"};
  function changed(){try{doc=P.store(doc);status("Changes saved in this browser. Download your updated JSON before leaving.")}catch(e){status("Unable to save: "+e.message,true)};refreshStats()}
  function record(id){return doc.assessments[id]||(doc.assessments[id]={grade:"",mark:null,max:null,date:"",www:"",hti:"",reflection1:"",reflection2:"",updatedAt:"",source:"Manual entry"})}
@@ -29,7 +31,7 @@
  }
  function populate(){
  $('name').value=doc.profile.student||"";$('year').value=doc.profile.clazz||"";$('target').value=doc.profile.target||"";
- $('rows').innerHTML=P.GROUPS.map(([id,label])=>{const r=doc.assessments[id]||{};const href=id==="slr1-3"?"slr1-3feedback.html":id==="slr4-5"?"slr4-5feedback.html":null;
+ $('rows').innerHTML=P.GROUPS.map(([id,label])=>{const r=doc.assessments[id]||{};const href=available[id]||null;
  return '<tr data-id="'+id+'"><td><strong>'+esc(label)+'</strong>'+(r.source?'<span class="tag">'+esc(r.source)+'</span>':"")+'</td><td><input aria-label="'+esc(label)+' date" data-field="date" type="date" value="'+esc(r.date||"")+'"></td><td><input aria-label="'+esc(label)+' marks" data-field="mark" type="number" min="0" step="1" value="'+(r.mark??"")+'"></td><td><input aria-label="'+esc(label)+' maximum marks" data-field="max" type="number" min="1" step="1" value="'+(r.max??"")+'"></td><td><select aria-label="'+esc(label)+' grade" data-field="grade">'+opts+'</select></td><td data-comp="'+id+'">–</td><td class="noPrint">'+(href?'<a href="'+href+'">Open feedback</a>':'<span class="tag">Record result here</span>')+'</td></tr>'}).join("");
  document.querySelectorAll("tr[data-id]").forEach(tr=>{const id=tr.dataset.id;tr.querySelector('[data-field="grade"]').value=doc.assessments[id]?.grade||"";tr.querySelector('[data-field="status"]').value=doc.assessments[id]?.status||((doc.assessments[id]?.grade)?"Feedback completed":"Not started");tr.querySelectorAll("[data-field]").forEach(el=>el.addEventListener("change",()=>{const r=record(id),f=el.dataset.field,v=el.value;if(f==="mark"||f==="max"){const n=v===""?null:Number(v);if(n!==null&&(!Number.isFinite(n)||n<0||(f==="max"&&n===0))){status("Enter a valid mark.",true);return}r[f]=n;if(r.mark!==null&&r.max!==null&&r.mark>r.max){status("The mark cannot exceed the maximum.",true);populate();return}}else r[f]=v;r.updatedAt=new Date().toISOString();changed()}))});
  $('selected').innerHTML=P.GROUPS.map(([id,label])=>'<option value="'+id+'">'+esc(label)+'</option>').join("");$('selected').value=selected;loadReflection();refreshStats();
